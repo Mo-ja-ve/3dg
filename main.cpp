@@ -12,16 +12,16 @@
 #define SCREEN_HEIGHT 480
 
 #define INDEX_FORWARD(Index) \
-Index = (Index + 1) % 3;
+    Index = (Index + 1) % triVertexList->length;
 
 #define INDEX_BACKWARD(Index) \
-Index = (Index - 1 + VertexList->Length) % 3;
+    Index = (Index - 1 + triVertexList->length) % triVertexList->length;
 
 #define INDEX_MOVE(Index,Direction) \
-if (Direction > 0) \
-Index = (Index + 1) % 3; \
+    if (Direction > 0) \
+        Index = (Index + 1) % 3; \
 else \
-Index = (Index - 1 + 3) % 3;
+    Index = (Index - 1 + 3) % 3;
 
 using namespace std;
 
@@ -76,9 +76,9 @@ int main(int argc, char** argv){
     int frameCount = 1;
 
     vert *VertexPtr = triVertexList->vertPtr;
+    float MinPoint_Y, MaxPoint_Y;
+    int leftEdgeDir, TopIsFlat, LeftEdgeDir,  MinIndexL, MaxIndex, MinIndexR, SkipFirst, temp;
     int i = 0;
-    float MinIndexL, MaxIndex, MinIndexR, SkipFirst, Temp;
-    float MinPoint_Y, MaxPoint_Y, TopIsFlat, LeftEdgeDir;
 
     struct HLineList WorkingHLineList;
     struct HLine *EdgePointPtr;
@@ -102,9 +102,12 @@ int main(int argc, char** argv){
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 0, 200, 200, 200);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[0].x, movePoint+triVertexList->vertPtr[0].y, movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y, movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y, movePoint+triVertexList->vertPtr[0].x, movePoint+triVertexList->vertPtr[0].y);
+        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[0].x, movePoint+triVertexList->vertPtr[0].y,
+                                      movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y);
+        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y, 
+                                      movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y);
+        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y, 
+                                      movePoint+triVertexList->vertPtr[0].x, movePoint+triVertexList->vertPtr[0].y);
 
 
        // polygon horizontal fill algorithm
@@ -122,7 +125,31 @@ int main(int argc, char** argv){
         }
 
         if (MinPoint_Y == MaxPoint_Y)
-        return(1); /* polygon is 0-height; avoid infinite loop below */
+            return(1); /* polygon is 0-height; avoid infinite loop below */
+
+        /* Scan in ascending order to find the last top-edge point */
+        MinIndexR = MinIndexL;
+        while (VertexPtr[MinIndexR].y == MinPoint_Y)
+            INDEX_FORWARD(MinIndexR);
+        INDEX_BACKWARD(MinIndexR); /* back up to last top-edge point */
+        /* Now scan in descending order to find the first top-edge point */
+        while (VertexPtr[MinIndexL].y == MinPoint_Y)
+            INDEX_BACKWARD(MinIndexL);
+        INDEX_FORWARD(MinIndexL); 
+
+        // find wich edge from top vertex is left edge, right edge
+        LeftEdgeDir = -1;
+        if ((TopIsFlat = (VertexPtr[MinIndexL].x != VertexPtr[MinIndexR].x) ? 1 : 0) == 1){
+            if (VertexPtr[MinIndexL].x > VertexPtr[MinIndexR].x){
+                LeftEdgeDir = 1;
+                temp = MinIndexL;
+                MinIndexL = MinIndexR;
+                MinIndexR = temp;
+            }
+        } else{
+            
+
+        }
 
         if (frameCount == 50){
             frameCount = 0;
