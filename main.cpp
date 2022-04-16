@@ -19,9 +19,9 @@
 
 #define INDEX_MOVE(Index,Direction) \
     if (Direction > 0) \
-        Index = (Index + 1) % 3; \
+        Index = (Index + 1) % 4; \
 else \
-    Index = (Index - 1 + 3) % 3;
+    Index = (Index - 1 + 4) % 4;
 
 using namespace std;
 
@@ -51,12 +51,14 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
 int main(int argc, char** argv){
 
     vertList *triVertexList = (vertList *) malloc(sizeof(struct vertList));
-    triVertexList->vertPtr = (struct vert *) malloc(sizeof(struct vert) * 3);
+    triVertexList->vertPtr = (struct vert *) malloc(sizeof(struct vert) * 5);
 
     triVertexList->vertPtr[0].x = 100.0; triVertexList->vertPtr[0].y = 200.0;
     triVertexList->vertPtr[1].x = 400.0; triVertexList->vertPtr[1].y = 200.0;
-    triVertexList->vertPtr[2].x = 175.0; triVertexList->vertPtr[2].y = 500.0;
-    triVertexList->length = 3;
+    triVertexList->vertPtr[2].x = 495.0; triVertexList->vertPtr[2].y = 500.0;
+    triVertexList->vertPtr[3].x = 50.0;  triVertexList->vertPtr[3].y = 350.0;
+    
+    triVertexList->length = 5;
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0){
         printf("Error: SDL failed to initialize\nSDL Error: '%s'\n", SDL_GetError());
@@ -87,8 +89,6 @@ int main(int argc, char** argv){
     int leftEdgeDir , TopIsFlat , LeftEdgeDir , MinIndexL  , MaxIndex , MinIndexR , SkipFirst , temp = 0;  
     int NextIndex, CurrentIndex, PreviousIndex;
     int DeltaXN, DeltaYN, DeltaXP, DeltaYP;
-    struct HLineList WorkingHLineList;
-    struct HLine *EdgePointPtr;
 
     while(running){
 
@@ -113,6 +113,8 @@ int main(int argc, char** argv){
         SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y, 
                                       movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y);
         SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y, 
+                                      movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y);
+        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y, 
                                       movePoint+triVertexList->vertPtr[0].x, movePoint+triVertexList->vertPtr[0].y);
 
        // polygon horizontal fill algorithm
@@ -124,7 +126,7 @@ int main(int argc, char** argv){
         MaxPoint_Y = VertexPtr[0].y;
         MinPoint_Y = VertexPtr[0].y;
 
-        for (int i = 1; i < 3; i++) {
+        for (int i = 1; i < 4; i++) {
         if (VertexPtr[i].y < MinPoint_Y){
             MinIndexL = i;
             MinPoint_Y = VertexPtr[i].y; /* new top */
@@ -151,6 +153,9 @@ int main(int argc, char** argv){
         while (VertexPtr[MinIndexL].y == MinPoint_Y)
             INDEX_BACKWARD(MinIndexL);
         INDEX_FORWARD(MinIndexL);
+
+        struct HLineList WorkingHLineList;
+        struct HLine *EdgePointPtr;
 
         // find wich edge from top vertex is left edge, right edge
         LeftEdgeDir = -1;
@@ -226,7 +231,7 @@ int main(int argc, char** argv){
             ScanEdge(VertexPtr[PreviousIndex].x + 0 - 1,
             VertexPtr[PreviousIndex].y,
             VertexPtr[CurrentIndex].x + 0 - 1,
-            VertexPtr[CurrentIndex].y, 0, SkipFirst, &EdgePointPtr);
+            VertexPtr[CurrentIndex].y, 0.0, SkipFirst, &EdgePointPtr);
             PreviousIndex = CurrentIndex;
             SkipFirst = 0; /* scan convert the first point from now on */
         } while (CurrentIndex != MaxIndex);
@@ -234,14 +239,14 @@ int main(int argc, char** argv){
 
         for(int i = 0; i < WorkingHLineList.length; i++){
             SDL_RenderDrawLineF(renderer, WorkingHLineList.HLinePtr[i].XStart, WorkingHLineList.yStart+(float)i, 
-                                          WorkingHLineList.HLinePtr[i].XEnd, WorkingHLineList.yStart+(float)i);
+                                         WorkingHLineList.HLinePtr[i].XEnd, WorkingHLineList.yStart+(float)i);
         }
         /* Release the line list's memory and we're successfully done */
         free(WorkingHLineList.HLinePtr);
 
         if (frameCount == 50){
             frameCount = 0;
-            //movePoint++;
+            movePoint++;
         }
         frameCount++;
 
@@ -290,37 +295,37 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
     /* Scan the edge for each scan line in turn */
     for (i = Height - SkipFirst; i-- > 0; WorkingEdgePointPtr++) {
     /* Store the X coordinate in the appropriate edge list */
-    if (SetXStart == 1)
-    WorkingEdgePointPtr->XStart = X1;
-    else
-    WorkingEdgePointPtr->XEnd = X1;
-    X1 += AdvanceAmt; /* move 1 pixel to the left or right */
-    }
+        if (SetXStart == 1)
+            WorkingEdgePointPtr->XStart = X1;
+        else
+            WorkingEdgePointPtr->XEnd = X1;
+            X1 += AdvanceAmt; /* move 1 pixel to the left or right */
+        }
     } else if (Height > Width) {
     /* Edge is closer to vertical than horizontal (Y-major) */
-    if (DeltaX >= 0)
-    ErrorTerm = 0; /* initial error term going left->right */
-    else
-    ErrorTerm = -Height + 1; /* going right->left */
+        if (DeltaX >= 0)
+        ErrorTerm = 0; /* initial error term going left->right */
+         else
+            ErrorTerm = -Height + 1; /* going right->left */
     if (SkipFirst) { /* skip the first point if so indicated */
     /* Determine whether it's time for the X coord to advance */
-    if ((ErrorTerm += Width) > 0) {
-    X1 += AdvanceAmt; /* move 1 pixel to the left or right */
-    ErrorTerm -= Height; /* advance ErrorTerm to next point */
-    }
+        if ((ErrorTerm += Width) > 0) {
+            X1 += AdvanceAmt; /* move 1 pixel to the left or right */
+            ErrorTerm -= Height; /* advance ErrorTerm to next point */
+        }
     }
     /* Scan the edge for each scan line in turn */
     for (i = Height - SkipFirst; i-- > 0; WorkingEdgePointPtr++) {
     /* Store the X coordinate in the appropriate edge list */
-    if (SetXStart == 1)
-    WorkingEdgePointPtr->XStart = X1;
-    else
-    WorkingEdgePointPtr->XEnd = X1;
+        if (SetXStart == 1)
+        WorkingEdgePointPtr->XStart = X1;
+        else
+        WorkingEdgePointPtr->XEnd = X1;
     /* Determine whether it's time for the X coord to advance */
-    if ((ErrorTerm += Width) > 0) {
-    X1 += AdvanceAmt; /* move 1 pixel to the left or right */
-    ErrorTerm -= Height; /* advance ErrorTerm to correspond */
-    }
+        if ((ErrorTerm += Width) > 0) {
+        X1 += AdvanceAmt; /* move 1 pixel to the left or right */
+        ErrorTerm -= Height; /* advance ErrorTerm to correspond */
+        }
     }
     } else {
     /* Edge is closer to horizontal than vertical (X-major) */
@@ -344,14 +349,14 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
     for (i = Height - SkipFirst; i-- > 0; WorkingEdgePointPtr++) {
     /* Store the X coordinate in the appropriate edge list */
         if (SetXStart == 1)
-        WorkingEdgePointPtr->XStart = X1;
+            WorkingEdgePointPtr->XStart = X1;
         else
-        WorkingEdgePointPtr->XEnd = X1;
-        X1 += XMajorAdvanceAmt; /* move X minimum distance */
+            WorkingEdgePointPtr->XEnd = X1;
+            X1 += XMajorAdvanceAmt; /* move X minimum distance */
     /* Determine whether it's time for X to advance one extra */
         if ((ErrorTerm += ErrorTermAdvance) > 0) {
-        X1 += AdvanceAmt; /* move X one more */
-        ErrorTerm -= Height; /* advance ErrorTerm to correspond */
+            X1 += AdvanceAmt; /* move X one more */
+            ErrorTerm -= Height; /* advance ErrorTerm to correspond */
         }
     }
     }
