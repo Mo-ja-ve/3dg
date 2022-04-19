@@ -91,7 +91,6 @@ int main(int argc, char** argv){
     int DeltaXN, DeltaYN, DeltaXP, DeltaYP;
 
     while(running){
-
         SDL_Event event;
         while(SDL_PollEvent(&event)){
             switch(event.type){
@@ -257,7 +256,6 @@ int main(int argc, char** argv){
     return 0;
 }
 
-
 void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipFirst, struct HLine **EdgePointPtr) {
 
     int Y, DeltaX, Height, Width, AdvanceAmt, ErrorTerm, i;
@@ -282,16 +280,16 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
     for (i = Height - SkipFirst; i-- > 0; WorkingEdgePointPtr++) {
     /* Store the X coordinate in the appropriate edge list */
         if (SetXStart == 1)
-        WorkingEdgePointPtr->XStart = X1;
-    else
-        WorkingEdgePointPtr->XEnd = X1;
+            WorkingEdgePointPtr->XStart = X1;
+        else
+            WorkingEdgePointPtr->XEnd = X1;
     }
 
     } else if (Width == Height) {
     /* The edge is diagonal; special-case by advancing the X
     coordinate 1 pixel for each scan line */
-    if (SkipFirst) /* skip the first point if so indicated */
-        X1 += AdvanceAmt; /* move 1 pixel to the left or right */
+        if (SkipFirst) /* skip the first point if so indicated */
+            X1 += AdvanceAmt; /* move 1 pixel to the left or right */
     /* Scan the edge for each scan line in turn */
     for (i = Height - SkipFirst; i-- > 0; WorkingEdgePointPtr++) {
     /* Store the X coordinate in the appropriate edge list */
@@ -304,8 +302,8 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
     } else if (Height > Width) {
     /* Edge is closer to vertical than horizontal (Y-major) */
         if (DeltaX >= 0)
-        ErrorTerm = 0; /* initial error term going left->right */
-         else
+            ErrorTerm = 0; /* initial error term going left->right */
+        else
             ErrorTerm = -Height + 1; /* going right->left */
     if (SkipFirst) { /* skip the first point if so indicated */
     /* Determine whether it's time for the X coord to advance */
@@ -318,13 +316,13 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
     for (i = Height - SkipFirst; i-- > 0; WorkingEdgePointPtr++) {
     /* Store the X coordinate in the appropriate edge list */
         if (SetXStart == 1)
-        WorkingEdgePointPtr->XStart = X1;
+            WorkingEdgePointPtr->XStart = X1;
         else
-        WorkingEdgePointPtr->XEnd = X1;
+            WorkingEdgePointPtr->XEnd = X1;
     /* Determine whether it's time for the X coord to advance */
         if ((ErrorTerm += Width) > 0) {
-        X1 += AdvanceAmt; /* move 1 pixel to the left or right */
-        ErrorTerm -= Height; /* advance ErrorTerm to correspond */
+            X1 += AdvanceAmt; /* move 1 pixel to the left or right */
+            ErrorTerm -= Height; /* advance ErrorTerm to correspond */
         }
     }
     } else {
@@ -333,25 +331,11 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
         XMajorAdvanceAmt = (Width / Height) * AdvanceAmt;
     /* Error term advance for deciding when to advance X 1 extra */
         ErrorTermAdvance = Width % Height;
-    if (DeltaX >= 0)
-        ErrorTerm = 0; /* initial error term going left->right */
-    else
-        ErrorTerm = -Height + 1; /* going right->left */
-    if (SkipFirst) { /* skip the first point if so indicated */
-        X1 += XMajorAdvanceAmt; /* move X minimum distance */
-    /* Determine whether it's time for X to advance one extra */
-        if ((ErrorTerm += ErrorTermAdvance) > 0) {
-            X1 += AdvanceAmt; /* move X one more */
-            ErrorTerm -= Height; /* advance ErrorTerm to correspond */
-        }
-    }
-    /* Scan the edge for each scan line in turn */
-    for (i = Height - SkipFirst; i-- > 0; WorkingEdgePointPtr++) {
-    /* Store the X coordinate in the appropriate edge list */
-        if (SetXStart == 1)
-            WorkingEdgePointPtr->XStart = X1;
+        if (DeltaX >= 0)
+            ErrorTerm = 0; /* initial error term going left->right */
         else
-            WorkingEdgePointPtr->XEnd = X1;
+            ErrorTerm = -Height + 1; /* going right->left */
+        if (SkipFirst) { /* skip the first point if so indicated */
             X1 += XMajorAdvanceAmt; /* move X minimum distance */
     /* Determine whether it's time for X to advance one extra */
         if ((ErrorTerm += ErrorTermAdvance) > 0) {
@@ -359,6 +343,20 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
             ErrorTerm -= Height; /* advance ErrorTerm to correspond */
         }
     }
+    /* Scan the edge for each scan line in turn */
+        for (i = Height - SkipFirst; i-- > 0; WorkingEdgePointPtr++) {
+    /* Store the X coordinate in the appropriate edge list */
+            if (SetXStart == 1)
+                WorkingEdgePointPtr->XStart = X1;
+            else
+                WorkingEdgePointPtr->XEnd = X1;
+                X1 += XMajorAdvanceAmt; /* move X minimum distance */
+                /* Determine whether it's time for X to advance one extra */
+                if ((ErrorTerm += ErrorTermAdvance) > 0) {
+                X1 += AdvanceAmt; /* move X one more */
+                ErrorTerm -= Height; /* advance ErrorTerm to correspond */
+                }
+        }
     }
     *EdgePointPtr = WorkingEdgePointPtr;
 }
