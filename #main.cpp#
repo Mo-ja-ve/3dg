@@ -6,53 +6,11 @@
 #include <math.h>
 
 
-#include <iostream>
+    float x,y
 
-#define SCREEN_WIDTH 720
-#define SCREEN_HEIGHT 480
-
-#define INDEX_FORWARD(Index) \
-    Index = (Index + 1) % triVertexList->length;
-
-#define INDEX_BACKWARD(Index) \
-    Index = (Index - 1 + triVertexList->length) % triVertexList->length;
-
-#define INDEX_MOVE(Index,Direction) \
-    if (Direction > 0) \
-        Index = (Index + 1) % 4; \
-else \
-    Index = (Index - 1 + 4) % 4;
-
-using namespace std;
-
-struct vert{
-    float x,y;
-};
-
-struct vertList{
-    int length;
-    struct vert *vertPtr;
-};
-
-struct HLine{
-    float XStart;
-    float XEnd;
-};
-
-struct HLineList{
-    int length;
-    float yStart;
-    struct HLine *HLinePtr;
-};
-
-
-void ScanEdge(float X, float Y1, float X2, float Y2, float SetXStart, int SkipFirst, struct HLine **EdgePointPtr);
-
-void ranfunc(void);
+void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipFirst, struct HLine **EdgePointPtr);
 
 int main(int argc, char** argv){
-
-    //ranfunc(1, 2, 3);
 
     vertList *triVertexList = (vertList *) malloc(sizeof(struct vertList));
     triVertexList->vertPtr = (struct vert *) malloc(sizeof(struct vert) * 5);
@@ -61,7 +19,6 @@ int main(int argc, char** argv){
     triVertexList->vertPtr[1].x = 400.0; triVertexList->vertPtr[1].y = 200.0;
     triVertexList->vertPtr[2].x = 495.0; triVertexList->vertPtr[2].y = 500.0;
     triVertexList->vertPtr[3].x = 50.0;  triVertexList->vertPtr[3].y = 350.0;
-    
     
     triVertexList->length = 5;
 
@@ -102,6 +59,7 @@ int main(int argc, char** argv){
                 case SDL_QUIT:
                 running = false;
                     break;
+
                 default:
                     break;
             }
@@ -119,36 +77,6 @@ int main(int argc, char** argv){
                                       movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y);
         SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y, 
                                       movePoint+triVertexList->vertPtr[0].x, movePoint+triVertexList->vertPtr[0].y);
-
-        SDL_SetRenderDrawColor(renderer, 150, 150, 150, 150);
-        // SDL_RenderDrawLineF(renderer, 50, 70,
-        //                         100, 100);
-        // SDL_SetRenderDrawColor(renderer, 160, 160, 160, 160);
-        // SDL_RenderDrawLineF(renderer, 100, 100,
-        //                         100 + (10) , 100 - (100*(-(sqrt(3)/2))));
-
-        // SDL_RenderDrawLineF(renderer, 100, 100,
-        //                         100, 100 - (100*(-(sqrt(3)/2))));
-
-        // SDL_RenderDrawLineF(renderer, 100, 100,
-        //                         100, 100 - (100*(-(sqrt(1)/2))));
-
-        // SDL_RenderDrawLineF(renderer, 100, 100,
-        //                         100, 100 - (100*(-(sqrt(2)/2))));
-        
-        // SDL_RenderDrawLineF(renderer, 100, 100,
-
-        //                         100 + 10, 100);
-        double degreeVal = 42.0;
-        degreeVal = degreeVal*(3.14/180);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[0].x+300, movePoint+triVertexList->vertPtr[0].y+300,
-                                      movePoint+triVertexList->vertPtr[0].x+100, movePoint+triVertexList->vertPtr[0].y+(100*sin(degreeVal)));
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y, 
-                                      movePoint+triVertexList->vertPtr[1].x+100, movePoint+triVertexList->vertPtr[1].y+(100*sin(degreeVal)));
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y, 
-                                      movePoint+triVertexList->vertPtr[2].x+100, movePoint+triVertexList->vertPtr[2].y+(100*sin(degreeVal)));
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y, 
-                                      movePoint+triVertexList->vertPtr[3].x+100, movePoint+triVertexList->vertPtr[3].y+(100*sin(degreeVal)));
 
        // polygon horizontal fill algorithm
         //pg 528
@@ -208,8 +136,9 @@ int main(int argc, char** argv){
             the first line down each edge; use those to compare slopes
             and see which line is leftmost */
             DeltaXN = VertexPtr[NextIndex].x - VertexPtr[MinIndexL].x;
-            DeltaYN = VertexPtr[NextIndex].y - VertexPtr[MinIndexL].y;  
+            DeltaYN = VertexPtr[NextIndex].y - VertexPtr[MinIndexL].y;
             DeltaXP = VertexPtr[PreviousIndex].x - VertexPtr[MinIndexL].x;
+	   
             DeltaYP = VertexPtr[PreviousIndex].y - VertexPtr[MinIndexL].y;
             if (((long)DeltaXN * DeltaYP - (long)DeltaYN * DeltaXP) < 0L) {
             LeftEdgeDir = 1; /* left edge runs up through vertex list */
@@ -277,14 +206,14 @@ int main(int argc, char** argv){
         /* Release the line list's memory and we're successfully done */
         free(WorkingHLineList.HLinePtr);
 
-        // if (frameCount == 50){
-        //     frameCount = 0;
-        //     movePoint++;
-        // }
-        // frameCount++;
+        if (frameCount == 50){
+            frameCount = 0;
+            movePoint++;
+        }
+        frameCount++;
 
-    SDL_RenderPresent(renderer);
-    //    SDL_RenderPresent(renderer);
+       SDL_RenderPresent(renderer);
+       SDL_RenderPresent(renderer);
     }
 
     return 0;
@@ -393,9 +322,4 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
         }
     }
     *EdgePointPtr = WorkingEdgePointPtr;
-}//  end ScanEdge()
-
-
-void ranfunc(void){
-
 }
