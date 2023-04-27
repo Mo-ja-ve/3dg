@@ -11,6 +11,8 @@
 #define SCREEN_WIDTH 720
 #define SCREEN_HEIGHT 480
 
+const float PI = 3.141593;
+
 #define INDEX_FORWARD(Index) \
     Index = (Index + 1) % triVertexList->length;
 
@@ -58,7 +60,7 @@ int main(int argc, char** argv){
     triVertexList->vertPtr = (struct vert *) malloc(sizeof(struct vert) * 5);
 
     triVertexList->vertPtr[0].x = 100.0; triVertexList->vertPtr[0].y = 200.0;
-    triVertexList->vertPtr[1].x = 400.0; triVertexList->vertPtr[1].y = 200.0;
+    triVertexList->vertPtr[1].x = 400.0; triVertexList->vertPtr[1].y = 350.0;
     triVertexList->vertPtr[2].x = 495.0; triVertexList->vertPtr[2].y = 500.0;
     triVertexList->vertPtr[3].x = 50.0;  triVertexList->vertPtr[3].y = 350.0;
     
@@ -93,7 +95,14 @@ int main(int argc, char** argv){
     float MinPoint_Y, MaxPoint_Y;
     int leftEdgeDir , TopIsFlat , LeftEdgeDir , MinIndexL  , MaxIndex , MinIndexR , SkipFirst , temp = 0;  
     int NextIndex, CurrentIndex, PreviousIndex;
+    MinIndexR = 0;
+    MaxIndex = 0;
+    MinIndexL = 0;
+    double degreeVal = 42;
+    degreeVal = degreeVal*(3.14/180);
     int DeltaXN, DeltaYN, DeltaXP, DeltaYP;
+    double movePointY, movePointX;
+    int i;
 
     while(running){
         SDL_Event event;
@@ -111,18 +120,35 @@ int main(int argc, char** argv){
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 0, 100, 100, 100);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[0].x, movePoint+triVertexList->vertPtr[0].y,
-                                      movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y, 
-                                      movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y, 
-                                      movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y, 
-                                      movePoint+triVertexList->vertPtr[0].x, movePoint+triVertexList->vertPtr[0].y);
+        movePointY = 100*sin(degreeVal);
+        movePointX = 100*cos(degreeVal);
+
+        SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[0].x, movePointY+triVertexList->vertPtr[0].y,
+                                      movePointX+triVertexList->vertPtr[1].x, movePointY+triVertexList->vertPtr[1].y);
+
+        float a = (triVertexList->vertPtr[1].x - triVertexList->vertPtr[0].x);
+        float b = (triVertexList->vertPtr[1].y - triVertexList->vertPtr[0].y);
+        float c = sqrt( pow(a,2) + pow(b, 2) );
+        c = a / c;
+        printf("Here's c: %f \n", c);
+        printf("Here's a: %f \n", a);
+        printf("Here's b: %f \n", b);
+        printf("Here's some trig: %f \n", acos(c) * (180.0 / PI));
+
+        SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[1].x, movePointY+triVertexList->vertPtr[1].y, 
+                                      movePointX+triVertexList->vertPtr[2].x, movePointY+triVertexList->vertPtr[2].y);
+        SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[2].x, movePointY+triVertexList->vertPtr[2].y, 
+                                      movePointX+triVertexList->vertPtr[3].x, movePointY+triVertexList->vertPtr[3].y);
+        SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[3].x, movePointY+triVertexList->vertPtr[3].y, 
+                                      movePointX+triVertexList->vertPtr[0].x, movePointY+triVertexList->vertPtr[0].y);
 
         SDL_SetRenderDrawColor(renderer, 150, 150, 150, 150);
         // SDL_RenderDrawLineF(renderer, 50, 70,
         //                         100, 100);
+
+
+
+
         // SDL_SetRenderDrawColor(renderer, 160, 160, 160, 160);
         // SDL_RenderDrawLineF(renderer, 100, 100,
         //                         100 + (10) , 100 - (100*(-(sqrt(3)/2))));
@@ -137,29 +163,24 @@ int main(int argc, char** argv){
         //                         100, 100 - (100*(-(sqrt(2)/2))));
         
         // SDL_RenderDrawLineF(renderer, 100, 100,
-
         //                         100 + 10, 100);
-        double degreeVal = 42.0;
-        degreeVal = degreeVal*(3.14/180);
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[0].x+300, movePoint+triVertexList->vertPtr[0].y+300,
-                                      movePoint+triVertexList->vertPtr[0].x+100, movePoint+triVertexList->vertPtr[0].y+(100*sin(degreeVal)));
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y, 
-                                      movePoint+triVertexList->vertPtr[1].x+100, movePoint+triVertexList->vertPtr[1].y+(100*sin(degreeVal)));
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y, 
-                                      movePoint+triVertexList->vertPtr[2].x+100, movePoint+triVertexList->vertPtr[2].y+(100*sin(degreeVal)));
-        SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y, 
-                                      movePoint+triVertexList->vertPtr[3].x+100, movePoint+triVertexList->vertPtr[3].y+(100*sin(degreeVal)));
+        // SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[0].x+300, movePoint+triVertexList->vertPtr[0].y+300,
+        //                               movePoint+triVertexList->vertPtr[0].x+100, movePoint+triVertexList->vertPtr[0].y+(100*sin(degreeVal)));
+        // SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[1].x, movePoint+triVertexList->vertPtr[1].y, 
+        //                               movePoint+triVertexList->vertPtr[1].x+100, movePoint+triVertexList->vertPtr[1].y+(100*sin(degreeVal)));
+        // SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[2].x, movePoint+triVertexList->vertPtr[2].y, 
+        //                               movePoint+triVertexList->vertPtr[2].x+100, movePoint+triVertexList->vertPtr[2].y+(100*sin(degreeVal)));
+        // SDL_RenderDrawLineF(renderer, movePoint+triVertexList->vertPtr[3].x, movePoint+triVertexList->vertPtr[3].y, 
+        //                               movePoint+triVertexList->vertPtr[3].x+100, movePoint+triVertexList->vertPtr[3].y+(100*sin(degreeVal)));
 
        // polygon horizontal fill algorithm
         //pg 528
         // scan list to find the top vertex
-        int MinIndexR = 0;
-        int MaxIndex = 0;
-        int MinIndexL = 0;
+
         MaxPoint_Y = VertexPtr[0].y;
         MinPoint_Y = VertexPtr[0].y;
 
-        for (int i = 1; i < 4; i++) {
+        for (i = 1; i < 4; i++) {
         if (VertexPtr[i].y < MinPoint_Y){
             MinIndexL = i;
             MinPoint_Y = VertexPtr[i].y; /* new top */
@@ -230,7 +251,6 @@ int main(int argc, char** argv){
         /* Get memory in which to store the line list we generate */
         if ((WorkingHLineList.HLinePtr = (struct HLine *) (malloc(sizeof(struct HLine) * WorkingHLineList.length))) == NULL)
             return(0); /* couldn't get memory for the line list */
-
         /* Scan the left edge and store the boundary points in the list */
         /* Initial pointer for storing scan converted left-edge coords */
         EdgePointPtr = WorkingHLineList.HLinePtr;
@@ -250,7 +270,6 @@ int main(int argc, char** argv){
             PreviousIndex = CurrentIndex;
             SkipFirst = 0; /* scan convert the first point from now on */
         } while (CurrentIndex != MaxIndex);
-
 
         /* Scan the right edge and store the boundary points in the list */
         EdgePointPtr = WorkingHLineList.HLinePtr;
@@ -277,11 +296,12 @@ int main(int argc, char** argv){
         /* Release the line list's memory and we're successfully done */
         free(WorkingHLineList.HLinePtr);
 
-        // if (frameCount == 50){
-        //     frameCount = 0;
-        //     movePoint++;
-        // }
-        // frameCount++;
+        if (frameCount == 50){
+            frameCount = 0;
+            //movePoint++;
+        }
+        //degreeVal++;
+        frameCount++;
 
     SDL_RenderPresent(renderer);
     //    SDL_RenderPresent(renderer);
@@ -394,8 +414,3 @@ void ScanEdge(float X1, float Y1, float X2, float Y2, float SetXStart, int SkipF
     }
     *EdgePointPtr = WorkingEdgePointPtr;
 }//  end ScanEdge()
-
-
-void ranfunc(void){
-
-}
