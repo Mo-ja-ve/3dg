@@ -63,7 +63,15 @@ int main(int argc, char** argv){
     triVertexList->vertPtr[1].x = 400.0; triVertexList->vertPtr[1].y = 350.0;
     triVertexList->vertPtr[2].x = 495.0; triVertexList->vertPtr[2].y = 500.0;
     triVertexList->vertPtr[3].x = 50.0;  triVertexList->vertPtr[3].y = 350.0;
-    
+    float a = (triVertexList->vertPtr[1].x - triVertexList->vertPtr[0].x);
+    float b = (triVertexList->vertPtr[1].y - triVertexList->vertPtr[0].y);
+    float c = sqrt( pow(a,2) + pow(b, 2) );
+    c = a / c;
+    printf("Here's c: %f \n", c);
+    printf("Here's a: %f \n", a);
+    printf("Here's b: %f \n", b);
+    printf("Here's some trig: %f \n", acos(c) * (180.0 / PI));
+    float theta = acos(c) * (180.0 / PI);
     
     triVertexList->length = 5;
 
@@ -120,20 +128,16 @@ int main(int argc, char** argv){
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 0, 100, 100, 100);
-        movePointY = 100*sin(degreeVal);
-        movePointX = 100*cos(degreeVal);
+        // movePointY = 100*sin(degreeVal);
+        // movePointX = 100*cos(degreeVal);
+        //theta = theta + 1.0;
+        //theta = theta % 360;
+        float thetaX = (float)( (int)(cos(theta)*(180.0/PI)));
+        float thetaY = (float)( (int)(sin(theta)*(180.0/PI)));
 
         SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[0].x, movePointY+triVertexList->vertPtr[0].y,
-                                      movePointX+triVertexList->vertPtr[1].x, movePointY+triVertexList->vertPtr[1].y);
+                                      movePointX+triVertexList->vertPtr[1].x + thetaX, movePointY+triVertexList->vertPtr[1].y + thetaY);
 
-        float a = (triVertexList->vertPtr[1].x - triVertexList->vertPtr[0].x);
-        float b = (triVertexList->vertPtr[1].y - triVertexList->vertPtr[0].y);
-        float c = sqrt( pow(a,2) + pow(b, 2) );
-        c = a / c;
-        printf("Here's c: %f \n", c);
-        printf("Here's a: %f \n", a);
-        printf("Here's b: %f \n", b);
-        printf("Here's some trig: %f \n", acos(c) * (180.0 / PI));
 
         SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[1].x, movePointY+triVertexList->vertPtr[1].y, 
                                       movePointX+triVertexList->vertPtr[2].x, movePointY+triVertexList->vertPtr[2].y);
@@ -296,9 +300,10 @@ int main(int argc, char** argv){
         /* Release the line list's memory and we're successfully done */
         free(WorkingHLineList.HLinePtr);
 
-        if (frameCount == 50){
+        if (frameCount == 60){
             frameCount = 0;
             //movePoint++;
+            theta = theta + 1.0;
         }
         //degreeVal++;
         frameCount++;
