@@ -5,7 +5,6 @@
 
 #include <math.h>
 
-
 #include <iostream>
 
 #define SCREEN_WIDTH 720
@@ -54,8 +53,6 @@ void ranfunc(void);
 
 int main(int argc, char** argv){
 
-    //ranfunc(1, 2, 3);
-
     vertList *triVertexList = (vertList *) malloc(sizeof(struct vertList));
     triVertexList->vertPtr = (struct vert *) malloc(sizeof(struct vert) * 5);
 
@@ -65,7 +62,7 @@ int main(int argc, char** argv){
     triVertexList->vertPtr[3].x = 50.0;  triVertexList->vertPtr[3].y = 350.0;
     float a = (triVertexList->vertPtr[1].x - triVertexList->vertPtr[0].x);
     float b = (triVertexList->vertPtr[1].y - triVertexList->vertPtr[0].y);
-    float c = sqrt( pow(a,2) + pow(b, 2) );
+    float c = sqrt( pow(a,2) + pow(b, 2) ); 
     c = a / c;
     printf("Here's c: %f \n", c);
     printf("Here's a: %f \n", a);
@@ -149,9 +146,6 @@ int main(int argc, char** argv){
         SDL_SetRenderDrawColor(renderer, 150, 150, 150, 150);
         // SDL_RenderDrawLineF(renderer, 50, 70,
         //                         100, 100);
-
-
-
 
         // SDL_SetRenderDrawColor(renderer, 160, 160, 160, 160);
         // SDL_RenderDrawLineF(renderer, 100, 100,
