@@ -132,14 +132,21 @@ int main(int argc, char** argv){
         float thetaX = (float)( (int)(cos(theta)*(180.0/PI)));
         float thetaY = (float)( (int)(sin(theta)*(180.0/PI)));
 
-        SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[0].x, movePointY+triVertexList->vertPtr[0].y,
-                                      movePointX+triVertexList->vertPtr[1].x + thetaX, movePointY+triVertexList->vertPtr[1].y + thetaY);
+        triVertexList->vertPtr[1].x = movePointX+triVertexList->vertPtr[1].x + thetaX;
+        triVertexList->vertPtr[1].y = movePointY+triVertexList->vertPtr[1].y + thetaY;
+        
+        triVertexList->vertPtr[2].x = movePointX+triVertexList->vertPtr[2].x + thetaX;
+        triVertexList->vertPtr[2].y = movePointY+triVertexList->vertPtr[2].y + thetaY;
 
+        SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[0].x, movePointY+triVertexList->vertPtr[0].y,
+                                      movePointX+triVertexList->vertPtr[1].x , movePointY+triVertexList->vertPtr[1].y);
 
         SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[1].x, movePointY+triVertexList->vertPtr[1].y, 
                                       movePointX+triVertexList->vertPtr[2].x, movePointY+triVertexList->vertPtr[2].y);
+
         SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[2].x, movePointY+triVertexList->vertPtr[2].y, 
                                       movePointX+triVertexList->vertPtr[3].x, movePointY+triVertexList->vertPtr[3].y);
+
         SDL_RenderDrawLineF(renderer, movePointX+triVertexList->vertPtr[3].x, movePointY+triVertexList->vertPtr[3].y, 
                                       movePointX+triVertexList->vertPtr[0].x, movePointY+triVertexList->vertPtr[0].y);
 
